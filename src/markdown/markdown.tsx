@@ -8,6 +8,8 @@ import React, {
 } from "react";
 import { CSS, PageBreak, Tailwind } from "..";
 
+type ReactElementWithProps = ReactElement<Record<string, any>>;
+
 interface TocRendererProps {
   heading: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   level: number;
@@ -26,8 +28,8 @@ export const Markdown = (props: MarkdownProps) => {
 
   let headers: TocRendererProps[] = [];
 
-  const isReactElement = (child: ReactNode): child is ReactElement<any> => {
-    return typeof child === "object" && child !== null && "type" in child;
+  const isReactElement = (child: ReactNode): child is ReactElementWithProps => {
+    return isValidElement<Record<string, any>>(child);
   };
 
   const detectHeader = (child: ReactNode) => {
@@ -46,7 +48,7 @@ export const Markdown = (props: MarkdownProps) => {
       } as TocRendererProps);
     }
 
-    if (isValidElement(child)) {
+    if (isReactElement(child)) {
       if (
         typeof child.type === "function" &&
         child.type.prototype &&
@@ -58,8 +60,10 @@ export const Markdown = (props: MarkdownProps) => {
         detectHeader(result);
       } else if (typeof child.type === "function") {
         // @ts-ignore
-        const result = child.type(child.props); // call the component
-        detectHeader(result);
+        const result = (child.type as React.FC<Record<string, any>>)(
+          child.props
+        ); // call the component
+        detectHeader(result as ReactNode);
       } else if (child.props && child.props.children) {
         Children.forEach(child.props.children, detectHeader);
       }
