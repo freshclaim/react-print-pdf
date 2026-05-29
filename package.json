@@ -34,7 +34,6 @@
   "scripts": {
     "build": "patch-package && tsup --external @fileforge/react-print --clean && tsup --external @fileforge/react-print",
     "test": "vitest --browser chrome",
-    "prepare": "npm run build",
     "dev": "(cd ./docs && mintlify dev --watch)",
     "build-components": "npm run build && tsx ./docgen/index.ts",
     "prune-docs": "tsx ./docgen/prune.ts",
